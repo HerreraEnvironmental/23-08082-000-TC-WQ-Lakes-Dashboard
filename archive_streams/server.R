@@ -1,5 +1,3 @@
-#server lakes
-
 library(dplyr)
 library(lubridate)
 library(ggplot2)
@@ -27,73 +25,73 @@ log10_minor_break = function (...){
   }
 }
 # Data Load ---------------------------------------------------------------
-source('wqx_data_query_functions.R',local=T)
-source('lake_functions/lake_site_map.R',local=T)
-source('lake_functions/lake_trends.R',local=T)
-source('lake_functions/lakes_profile_plot_function.R',local=T)
-source('lake_functions/tsi_calc_plot.R',local=T)
-source('lake_functions/tsi_map.R',local=T)
- source('functions/trend_summary_and_plot.R',local=T)
+source('functions/wqc_functions.R',local=T)
+source('functions/site_map.R',local=T)
+source('functions/trend_summary_and_plot.R',local=T)
+source('functions/wqc_map.R',local=T)
+source('functions/wqc_site.R',local=T)
+source('functions/trend_shiny_functions.R',local=T)
+source('functions/withinYear_plot.R',local=T)
+source('functions/wqi_site_plot.R',local=T)
+source('functions/wqi_map.R',local=T)
 
- source('functions/trend_shiny_functions.R',local=T)
+streams_wq_dat<-readRDS('outputs/streams_wq_dat.RDS')
+streams_sites<-readRDS('outputs/streams_sites.RDS')
+annual_wqi<-readRDS('outputs/annual_wqi.RDS') %>%
+  mutate(Rating=ifelse(WQI>=80,'Good',
+                       ifelse(WQI>=40,'Moderate','Poor')))
 
 
-lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
-  transmute(
-    SITE_CODE=MonitoringLocationIdentifier,
-    SITE_NAME=MonitoringLocationName,
-    LAT=as.numeric(LatitudeMeasure),
-    LON=as.numeric(LongitudeMeasure)
-  )
+monthly_wqi_by_parameter<-readRDS('outputs/monthly_wqi_by_parameter.RDS')
+monthly_wqi<-readRDS('outputs/monthly_wqi.RDS')
 
-lakes_wq_dat<- WQX_PULL(project='Ambient_Water_Quality_Lakes') %>%
-  wqx_cleanup()
-lakes_tsi_data<-lakes_wq_dat %>%
+sites_list<-readRDS('outputs/sites_list.RDS')
+parm_list<-readRDS('outputs/parm_list.RDS')
+years_list<-readRDS('outputs/years_list.RDS')
+
+sites_list_df <- streams_sites[,c(2,3)]
+streams_wq_dat <- merge(streams_wq_dat, sites_list_df, by="SITE_CODE")
+
+#For recent stream data (sample time and WQI score)
+
+recent_streams_data<-streams_wq_dat %>%
   group_by(SITE_CODE) %>%
-  tidyr::nest() %>%
-  mutate(TSI_out=map(.x=data,.f=~tsi_calc(.x))) %>%
-  select(-data) %>%
-  tidyr::unnest(TSI_out)
+  slice(which.max(as.Date(ymd_hms(DateTime)))) %>%
+  select(SITE_CODE,DateTime) %>%
+  left_join(.,
+            annual_wqi%>%
+              slice(which.max(WaterYear)),
+            by=c('SITE_CODE'='site')
+  ) %>%
+  left_join(streams_sites) %>%
+  arrange(desc(DateTime))
 
-years_list<-sort(unique(lakes_wq_dat$Year))
 
-parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
-             "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
-             'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
-             'Alkalinity, carbonate','Pheophytin')
 
 server<-function(input,output,session){
   #OPENER TAB
   output$map<-renderLeaflet({
-    site_map(lakes_list)
+    site_map(recent_streams_data,input)
   })
-  #TSI MAP TAB
-  annual_tsi<-reactive({
-    lakes_tsi_data %>%
-      filter(Year==input$tsi_sum_year)
+  #WQI MAP TAB
+  output$wqi_map<-renderLeaflet({
+    wqi_map(streams_sites,annual_wqi,input)
   })
-  
-  output$tsi_map<-renderLeaflet({
-    tsi_map(lakes_list,annual_tsi(),input$tsi_sum_year,plotParm=input$tsi_map_parm)
-  })
-  output$tsi_summary_plot<-renderPlotly({
-    tsi_summary_plot(annual_tsi())
+  output$wqi_summary_plot<-renderPlotly({
+    wqi_summary_plot(annual_wqi,input)
   })
   
   
   #TRENDS TAB
   trend_summary<-reactive({
-    trend_summary_func(lakes_wq_dat,input)
+    trend_summary_func(streams_wq_dat,input)
   })
-  
   output$trend_summary_map<-renderLeaflet({
     trend_summary_map(trend_summary(),streams_sites,input)
   })
-  
   output$trend_summary_trend_plot<-renderPlotly({
-    trend_summary_trend_plot(lakes_wq_dat,input)
+    trend_summary_trend_plot(streams_wq_dat,input)
   })
-  
   output$trend_summary_plot<-renderPlotly({
     trend_summary_plot(trend_summary(),input)
   })
@@ -101,8 +99,8 @@ server<-function(input,output,session){
   observeEvent(input$trend_summary_map_marker_click, {
     p <- input$trend_summary_map_marker_click
     if(!is.null(p$id)){
-      updateSelectInput(session, "trend_summary_site", 
-                        selected =p$id)
+    updateSelectInput(session, "trend_summary_site", 
+                      selected =p$id)
     }
   })
   
@@ -122,13 +120,31 @@ server<-function(input,output,session){
     }
   )
   
- 
+  #Water Quality Criteria MAP
+  
+  wqc_map_out<-reactive({
+    wqc_comparison(streams_wq_dat,input)
+    
+  })
+  
+  output$wqc_map<-renderLeaflet({
+    wqc_map(wqc_map_out(),stream_sites,input)
+  })
+  
+  output$wqc_summary<-renderTable({
+    wqc_table(wqc_map_out(),input)
+  })
+  
   #Individual  Site Water Quality 
- 
+  output$wqc_site<-renderTable({
+    wqc_site(streams_wq_dat,input)
+  })
   
   dataSubset<-reactive({
-   lakes_wq_dat %>%
-      filter(SITE_CODE==input$main_site)
+    streams_wq_dat %>%
+      filter(SITE_CODE==input$main_site&
+               parameter==input$trend_parm)%>%
+      mutate(AquaticLifeUse='Core Summer Salmonid Habitat') ### need to pull from lookup table
   })
   
   output$data_plot<-renderPlotly({
@@ -143,14 +159,35 @@ server<-function(input,output,session){
     trend_text(dataSubset(),input)
   })
   
+
+  
+  #Individual WQI Plot
+
+  output$wqi_annual<-renderPlotly({
+    ggplotly(wqi_annual_plot(annual_wqi,input),
+             source='wqi_year_select') %>% event_register("plotly_click")
+  })
+  
+  output$wqi_monthly<-renderPlotly({
+    monthly_wqi_plot(monthly_wqi_by_parameter,input)
+  })
+  
+  
+  observeEvent(event_data("plotly_click",source='wqi_year_select'), {
+    s <- event_data("plotly_click", source = "wqi_year_select")
+    updateSelectInput(session, "wqi_sum_year", 
+                      selected =s)
+    updateSelectInput(session, "wqi_year", 
+                      selected =s)
+  })
   
   #DAta Download TAb
   dataout_data<-reactive({
-    lakes_wq_dat %>%
+    streams_wq_dat %>%
       filter(SITE_CODE %in% input$main_site4&
                parameter==input$params_out&
-               Year>=input$years_out[1]&Year<=input$years_out[2])%>% 
-      select(SITE_CODE,SITE_NAME,DateTime,parameter,depth,value,unit,mdl)
+               WaterYear>=input$years_out[1]&WaterYear<=input$years_out[2])%>% 
+      select(SITE_CODE,SITE_NAME,DateTime,parameter,value,unit,mdl)
   })
   
   output$data_view_table <- renderDT({
@@ -209,21 +246,20 @@ server<-function(input,output,session){
     updateSelectInput(session,
                       'trend_parm',
                       choices=parm_list[
-                        parm_list %in% (lakes_wq_dat %>% filter(SITE_CODE==input$main_site) %>% 
-                                          pull(parameter) %>% unique())]
+                        parm_list %in% (streams_wq_dat %>% filter(SITE_CODE==input$main_site) %>% pull(parameter) %>% unique())]
     )
   })
   observe({
     updateSelectInput(session,
                       'data_year2',
-                      choices=lakes_wq_dat %>% filter(SITE_CODE==input$main_site) %>% pull(Year) %>% unique()
+                      choices=streams_wq_dat %>% filter(SITE_CODE==input$main_site) %>% pull(WaterYear) %>% unique()
     )
   })
   
   observe({
     updateSelectInput(session,
                       'data_year',
-                      choices = sort(unique(dataSubset()$Year),T)
+                      choices = sort(unique(dataSubset()$WaterYear),T)
     )
   })
   
@@ -232,7 +268,7 @@ server<-function(input,output,session){
     updateSelectInput(session,
                       'data_parm',
                       choices=parm_list[
-                        parm_list %in% (lakes_wq_dat %>% filter(SITE_CODE==input$main_site) %>% pull(parameter) %>% unique())]
+                        parm_list %in% (streams_wq_dat %>% filter(SITE_CODE==input$main_site) %>% pull(parameter) %>% unique())]
     )
   })
   # MAP 1 updates all variables
