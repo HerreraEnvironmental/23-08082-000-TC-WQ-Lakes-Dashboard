@@ -12,6 +12,7 @@ library(shinyWidgets)
 library(purrr)
 library(tidyr)
 library(rkt)
+library(vegabrite)
 
 
 log10_minor_break = function (...){
@@ -33,9 +34,9 @@ source('lake_functions/lake_trends.R',local=T)
 source('lake_functions/lakes_profile_plot_function.R',local=T)
 source('lake_functions/tsi_calc_plot.R',local=T)
 source('lake_functions/tsi_map.R',local=T)
- source('functions/trend_summary_and_plot.R',local=T)
+source('lake_functions/trend_summary_and_plot.R',local=T)
 
- source('functions/trend_shiny_functions.R',local=T)
+ source('lake_functions/trend_shiny_functions.R',local=T)
 
 
 lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
@@ -73,6 +74,13 @@ server<-function(input,output,session){
       filter(Year==input$tsi_sum_year)
   })
   
+  observe({
+    updateSelectInput(session,
+                      'tsi_sum_year',
+                      choices=rev(lakes_tsi_data$Year),
+                      selected=max(lakes_tsi_data$Year))
+  })
+  
   output$tsi_map<-renderLeaflet({
     tsi_map(lakes_list,annual_tsi(),input$tsi_sum_year,plotParm=input$tsi_map_parm)
   })
@@ -83,20 +91,35 @@ server<-function(input,output,session){
   
   #TRENDS TAB
   trend_summary<-reactive({
-    trend_summary_func(lakes_wq_dat,input)
+    trend_summary_func(lakes_wq_dat %>% filter(depth<=1),input)
   })
   
   output$trend_summary_map<-renderLeaflet({
-    trend_summary_map(trend_summary(),streams_sites,input)
+    trend_summary_map(trend_summary(),lakes_list,input)
   })
   
-  output$trend_summary_trend_plot<-renderPlotly({
-    trend_summary_trend_plot(lakes_wq_dat,input)
+  output$trend_summary_trend_plot<-renderVegawidget({
+    lake_trends_plot(lakes_wq_dat %>% filter(SITE_CODE==input$trend_summary_site&depth<=1),
+                     site=input$trend_summary_site,
+                     parm=input$trend_summary_parm,
+                     rktSeason = input$rktSeason,
+                     startYear = input$trend_summary_years[1],endYear = input$trend_summary_years[2],
+                     minDepth = 0,maxDepth = 1,
+                     rktAuto = input$rktAuto,
+                     logPlot = input$trend_summary_log_scale)
   })
-  
-  output$trend_summary_plot<-renderPlotly({
-    trend_summary_plot(trend_summary(),input)
+  output$trend_summary_text<-renderUI({
+    lake_trends(lakes_wq_dat %>% filter(SITE_CODE==input$trend_summary_site&depth<=1),
+                site=input$trend_summary_site,
+                parm=input$trend_summary_parm,
+                rktSeason = input$rktSeason,
+                startYear = input$trend_summary_years[1],endYear = input$trend_summary_years[2],
+                minDepth = 0,maxDepth = 1,
+                rktAuto = input$rktAuto)
   })
+  # output$trend_summary_plot<-renderPlotly({
+  #   trend_summary_plot(trend_summary(),input)
+  # })
   
   observeEvent(input$trend_summary_map_marker_click, {
     p <- input$trend_summary_map_marker_click
@@ -111,6 +134,8 @@ server<-function(input,output,session){
     
   })
   
+  
+  
   output$trends_download <- downloadHandler(
     filename = function() {
       paste('trends-', Sys.Date(), '.csv', sep='')
@@ -122,6 +147,11 @@ server<-function(input,output,session){
     }
   )
   
+  #TSI
+  output$tsi_annual<-renderVegawidget({
+    tsi_plot(data=lakes_wq_dat %>% filter(SITE_CODE==input$main_site),
+             epi_depth=5)
+  })
  
   #Individual  Site Water Quality 
  
@@ -131,16 +161,27 @@ server<-function(input,output,session){
       filter(SITE_CODE==input$main_site)
   })
   
-  output$data_plot<-renderPlotly({
-    withinYear_plot(dataSubset(),input)
+
+  
+  output$data_plot<-renderVegawidget({
+    lake_profile_plot(dataSubset(),parm=input$trend_parm,
+                      month=input$data_month,year=input$data_year,profile_log=input$data_log_scale,
+                      maxDepth = max(dataSubset()$depth,na.rm=T))
   })
   
-  output$trend_plot<-renderPlotly({
-    trend_plot(dataSubset(),input)
+  output$trend_plot<-renderVegawidget({
+    lake_trends_plot(dataSubset(),site=input$main_site,parm=input$trend_parm,rktSeason = input$rktSeason_oneSite,
+                startYear = input$trend_years[1],endYear = input$trend_years[2],
+                minDepth = input$trend_depths[1],maxDepth = input$trend_depths[2],
+                rktAuto = input$rktAuto_oneSite,
+                logPlot = input$data_log_scale)
   })
   
   output$trend_text<-renderUI({
-    trend_text(dataSubset(),input)
+    lake_trends(dataSubset(),site=input$main_site,parm=input$trend_parm,rktSeason = input$rktSeason_oneSite,
+                startYear = input$trend_years[1],endYear = input$trend_years[2],
+                minDepth = input$trend_depths[1],maxDepth = input$trend_depths[2],
+                rktAuto = input$rktAuto_oneSite)
   })
   
   
@@ -150,7 +191,7 @@ server<-function(input,output,session){
       filter(SITE_CODE %in% input$main_site4&
                parameter==input$params_out&
                Year>=input$years_out[1]&Year<=input$years_out[2])%>% 
-      select(SITE_CODE,SITE_NAME,DateTime,parameter,depth,value,unit,mdl)
+      select(SITE_CODE,DateTime,parameter,depth,value,unit,qualifier)
   })
   
   output$data_view_table <- renderDT({
@@ -205,6 +246,16 @@ server<-function(input,output,session){
                               max(dataSubset()$Year))
     )
   })
+  
+  observe({
+    updateSliderInput(session,
+                      'trend_depths',
+                      min=min(dataSubset()$depth),
+                      max=max(dataSubset()$depth),
+                      value=c(min(dataSubset()$depth),
+                              max(dataSubset()$depth)))
+  })
+  
   observe({
     updateSelectInput(session,
                       'trend_parm',

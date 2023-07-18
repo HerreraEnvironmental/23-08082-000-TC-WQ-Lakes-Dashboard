@@ -7,10 +7,11 @@ tsi_map<-function(lakes_list,annual_tsi,selectYear,plotParm=c('Chlorophyll a','T
   ## add for each score
   
   selectIndex<-  annual_tsi %>%
-    filter(parameter==plotParm)
+    filter(parameter==plotParm) %>%
+    mutate(parameter=factor(parameter,levels=c('Chlorophyll a','Total Phosphorus','Secchi Depth')))
   
   annual_tsi %>%
-    tidyr::pivot_wider(id_cols = c(SITE_CODE),names_from=parameter,values_from = TSI) %>%
+    tidyr::pivot_wider(id_cols = c(SITE_CODE),names_from=parameter,values_from = TSI,names_expand=T) %>%
     left_join(selectIndex) %>%
     left_join(lakes_list) %>%
     mutate(Category=ifelse(TSI>=60,'Eutrophic',ifelse(TSI>=40,"Mesotrophic",'Oligotrophic'))) %>%
@@ -20,17 +21,17 @@ tsi_map<-function(lakes_list,annual_tsi,selectYear,plotParm=c('Chlorophyll a','T
                      popup=~paste0("<h5>", "<b>", SITE_NAME,'<br>', "</b>","</h5>",
                                    "<hr>",
                                    "For",selectYear,  ", the TSI score was ", "<b>",round(TSI,0),' for ',plotParm,
-                                   "</b>",", and is considered ", "<b>", Category, "</b>",".","<br>",
-                                   'Chlorophyll a TSI: ',`Chlorophyll a`,'<br>',
-                                   'Total Phosphorus TSI: ', `Total Phosphorus`,'<br>',
-                                   'Secchi Depth TSI:',`Secchi Depth`
+                                   "</b>",", and is considered ", "<b>", Category, "</b>","."#,"<br>",
+                                   # 'Chlorophyll a TSI: ',`Chlorophyll a`,'<br>',
+                                   # 'Total Phosphorus TSI: ', `Total Phosphorus`,'<br>',
+                                   # 'Secchi Depth TSI:',`Secchi Depth`
                                    
                      ),
                      layerId= ~SITE_CODE,
                      label = ~SITE_CODE) %>%
     addProviderTiles('Esri.NatGeoWorldMap') %>%
      addLegend(pal=pal,values=factor(c('Eutrophic',"Mesotrophic",'Oligotrophic'),levels=c('Eutrophic',"Mesotrophic",'Oligotrophic')),
-               title='Trophic State Index')
+               title=paste('Trophic State Index for',plotParm))
 }
 
 # tsi_map(lakes_list,

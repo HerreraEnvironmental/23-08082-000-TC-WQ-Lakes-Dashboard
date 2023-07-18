@@ -59,7 +59,7 @@ tsi_plot<-function(data,...){
     vl_encode_tooltip(field='parameter:N') |>
     vl_encode_tooltip(field='Year:Q') |>
     vl_encode_tooltip(field='TSI:Q') |>
-    vl_add_properties(width=400,height=400) 
+    vl_add_properties(width=600,height=400) 
  #tsi_plot 
   #vl_layer(oligo_meso_line,tsi_plot)
   vl_layer(tsi_rect,tsi_plot)

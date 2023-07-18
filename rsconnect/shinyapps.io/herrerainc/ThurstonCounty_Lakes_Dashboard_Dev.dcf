@@ -1,0 +1,14 @@
+name: ThurstonCounty_Lakes_Dashboard_Dev
+title: ThurstonCounty_Lakes_Dashboard_Dev
+username:
+account: herrerainc
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9474652
+bundleId: 7472068
+url: https://herrerainc.shinyapps.io/ThurstonCounty_Lakes_Dashboard_Dev/
+when: 1689707396.39186
+lastSyncTime: 1689707396.39187
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md

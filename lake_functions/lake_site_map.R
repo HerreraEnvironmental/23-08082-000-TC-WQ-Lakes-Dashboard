@@ -5,7 +5,7 @@ site_map<-function(site_list){
 leaflet(site_list) %>%
   addMarkers(popup=~paste0("<h5>", "<b>", SITE_NAME,'<br>', "</b>","</h5>",
                            "<h6>", "<b>", "Click to do the following:", "</b>","<ul>","<br>",
-                           "<li>", "<a onclick=","customHref('tsii')>",'View Trophic State Indix Index','</a>', "<br>","</li>",
+                           "<li>", "<a onclick=","customHref('tsi')>",'View Trophic State Index','</a>', "<br>","</li>",
                            "<li>", "<a onclick=","customHref('all_data')>",'View Water Quality trends and all data for this station','</a>', "<br>","</li>",
                            "<li>", "<a onclick=","customHref('data_download')>",'Download all data for this station', '</a>', "<br>","</li>",
                            "</ul>","</h6>"),

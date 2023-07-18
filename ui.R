@@ -12,6 +12,7 @@ library(shinyWidgets)
 library(purrr)
 library(tidyr)
 library(rkt)
+library(vegabrite)
 
 source('wqx_data_query_functions.R',local=T)
 
@@ -55,7 +56,13 @@ ui<-tagList(
              column(12,h1("Summary of Trophic State Index")),
              column(12, hr()),
              fluidRow(column(8,leafletOutput('tsi_map',height=800,width=1200)),
-                      column(4, 
+                      column(4,
+                             p(paste('Lakes are commonly classified into three trophic states based on their amount of nutrients and algae.',
+                             'Oligotrophic lakes have the lowest amount of nutrients and are often mountain lakes or lakes in',
+                              'undisturbed forests. Eutrophic lakes have the highest amount of nutrients and can be naturally',
+                              'productive but are often highly altered lakes and may have frequent algal blooms. Mesotrophic lakes',
+                              'have moderate amounts of nutrients and are common in lowland western Washington, especially in',
+                              'areas with some development along the shoreline and in the watershed')),
                              selectInput('tsi_sum_year','Select Year to Highlight',years_list),
                              selectInput('tsi_map_parm','Select Trophic State Index to Map',
                                          c('Chlorophyll a','Total Phosphorus','Secchi Depth')),
@@ -92,25 +99,33 @@ ui<-tagList(
                            fluidRow(h2('Trend for Selected Site'),
                                     column(2),
                                     pickerInput('trend_summary_site','Select Site',sites_list)),
-                           plotlyOutput('trend_summary_trend_plot')
+                           #plotlyOutput('trend_summary_trend_plot')
+                           vegawidgetOutput('trend_summary_trend_plot'),
+                           htmlOutput('trend_summary_text')
                          )
                )),
              fluidRow(column(12, br()))
     ), 
-    tabPanel('TSI',value='tsi',
+    tabPanel('Lake Trophic State Index',value='tsi',
              column(12,h1("Trophic State Index")),
              column(12, hr()),
              fluidRow(column(12,sidebarLayout(
                sidebarPanel(width=3,
-                            pickerInput('main_site','Select Site',sites_list),
-                            selectInput('tsi_year','Select Year to Highlight',years_list),
-                            sliderInput('tsi_trend_years','Select Year Range for Trend',value=c(min(years_list),max(years_list)),
-                                        min=min(years_list),max=max(years_list),
-                                        step=1,sep='')
+                            p(paste('Lakes are commonly classified into three trophic states based on their amount of nutrients and algae.',
+                                    'Oligotrophic lakes have the lowest amount of nutrients and are often mountain lakes or lakes in',
+                                    'undisturbed forests. Eutrophic lakes have the highest amount of nutrients and can be naturally',
+                                    'productive but are often highly altered lakes and may have frequent algal blooms. Mesotrophic lakes',
+                                    'have moderate amounts of nutrients and are common in lowland western Washington, especially in',
+                                    'areas with some development along the shoreline and in the watershed')),
+                            pickerInput('main_site','Select Site',sites_list)#,
+                         #   selectInput('tsi_year','Select Year to Highlight',years_list),
+                            # sliderInput('tsi_trend_years','Select Year Range for Trend',value=c(min(years_list),max(years_list)),
+                            #             min=min(years_list),max=max(years_list),
+                            #             step=1,sep='')
                )
                ,
                mainPanel(width=9,
-                         fluidRow(plotlyOutput('tsi_annual'))
+                         fluidRow(vegawidgetOutput('tsi_annual'))
                          
                ))
                
@@ -126,6 +141,8 @@ ui<-tagList(
                             pickerInput('main_site2','Select Site',sites_list, multiple = F),
                             selectInput('data_year','Select Year to Highlight',years_list),
                             selectInput('trend_parm','Select Parameter',parm_list),
+                            sliderInput('data_month','Select Month(s) for Profile Plots',min=1,max=12,step=1,
+                                        value=c(6,9)),
                             sliderInput('trend_years','Select Year Range for Trend',value=c(2000,2020),
                                         min=2000,max=2020,
                                         step=1,sep=''),
@@ -138,13 +155,16 @@ ui<-tagList(
                                           'Summer (Jul-Sep)'='summer','Fall (Oct-Dec)'='fall')),
                             materialSwitch(inputId = "data_log_scale", label = "Log-scale?", status = "default",value=F),
                             hr(),
-                            h2('Water Quality Criteria Comparison for Selected Year'),
-                            tableOutput('wqc_site')
+                           # h2('Water Quality Criteria Comparison for Selected Year'),
+                           # tableOutput('wqc_site')
                             
                ),
                mainPanel(width = 9,
-                         plotlyOutput('data_plot'),
-                         plotlyOutput('trend_plot'),
+                         h2('Monthly Lake Water Quality Profiles'),
+                         column(9,vegawidgetOutput('data_plot')),
+                         hr(),
+                         h2('Long-term Trend'),
+                         column(9,vegawidgetOutput('trend_plot')),
                          htmlOutput('trend_text')
                )),
              fluidRow(column(12, br()))

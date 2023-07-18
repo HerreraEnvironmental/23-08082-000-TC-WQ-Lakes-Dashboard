@@ -25,7 +25,7 @@ lake_trends_plot<-function(data,site,parm,rktSeason,startYear,endYear,minDepth,m
     vl_filter(filter=paste0("datum.Year>=",startYear,"&datum.Year<=",endYear,
                             '&datum.depth>=',minDepth,'&datum.depth<=',maxDepth))|>
     vl_mark_line(color='firebrick')|>
-    vl_loess(loess='value',on='DateTime') |>
+    vl_loess(loess='value',on='DateTime',bandwidth = 1) |>
     vl_encode_y("value:Q",
                 title=parm,
                 scale=list(type=ifelse(logPlot,'log','linear'))) 
@@ -33,15 +33,15 @@ lake_trends_plot<-function(data,site,parm,rktSeason,startYear,endYear,minDepth,m
   vl_layer(dots,line) |>
     vl_add_data(values=temp_trend_data)|>
     vl_encode_x("DateTime:T",title='')  |>
-    vl_add_properties(width=400,height=400)
+    vl_add_properties(width=600,height=400)
   
 }
 
-WQX_PULL(startYear = 2000,endYear = 2022,project='Ambient_Water_Quality_Lakes',
-         site_list = c('THURSTONCOUNTY-EH-BLADEL000')) |>
-  wqx_cleanup() %>%
-  lake_trends_plot(site='Black Lake',parm='Total Phosphorus',rktSeason = 'All',rktAuto=F,
-              startYear=2000,endYear=2022,minDepth=0,maxDepth=1,logPlot=T)
+# WQX_PULL(startYear = 2000,endYear = 2022,project='Ambient_Water_Quality_Lakes',
+#          site_list = c('THURSTONCOUNTY-EH-BLADEL000')) |>
+#   wqx_cleanup() %>%
+#   lake_trends_plot(site='Black Lake',parm='Total Phosphorus',rktSeason = 'All',rktAuto=F,
+#               startYear=2000,endYear=2022,minDepth=0,maxDepth=1,logPlot=T)
 
 lake_trends<-function(data,site,parm,rktSeason,startYear,endYear,minDepth,maxDepth,rktAuto){
   temp_trend_data<-data |>
@@ -75,8 +75,8 @@ lake_trends<-function(data,site,parm,rktSeason,startYear,endYear,minDepth,maxDep
               'Note values at depths ',minDepth,' to ',maxDepth,' m are averaged for each month with no weighting for volume.'))
 }
 
-WQX_PULL(startYear = 2000,endYear = 2022,project='Ambient_Water_Quality_Lakes',
-         site_list = c('THURSTONCOUNTY-EH-BLADEL000')) |>
-  wqx_cleanup() %>%
-  lake_trends(site='Black Lake',parm='Total Phosphorus',rktSeason = 'All',rktAuto=F,
-              startYear=2000,endYear=2022,minDepth=1,maxDepth=10)
+# WQX_PULL(startYear = 2000,endYear = 2022,project='Ambient_Water_Quality_Lakes',
+#          site_list = c('THURSTONCOUNTY-EH-BLADEL000')) |>
+#   wqx_cleanup() %>%
+#   lake_trends(site='Black Lake',parm='Total Phosphorus',rktSeason = 'All',rktAuto=F,
+#               startYear=2000,endYear=2022,minDepth=1,maxDepth=10)
