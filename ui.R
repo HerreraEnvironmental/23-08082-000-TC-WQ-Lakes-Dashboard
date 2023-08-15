@@ -14,20 +14,20 @@ library(tidyr)
 library(rkt)
 library(vegabrite)
 
-source('wqx_data_query_functions.R',local=T)
+#source('wqx_data_query_functions.R',local=T)
 
-lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
-  transmute(
-    SITE_CODE=MonitoringLocationIdentifier,
-    SITE_NAME=MonitoringLocationName,
-    LAT=as.numeric(LatitudeMeasure),
-    LON=as.numeric(LongitudeMeasure)
-  )
+# lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
+#   transmute(
+#     SITE_CODE=MonitoringLocationIdentifier,
+#     SITE_NAME=MonitoringLocationName,
+#     LAT=as.numeric(LatitudeMeasure),
+#     LON=as.numeric(LongitudeMeasure)
+#   )
+lake_sites<-readRDS('outputs/lake_sites.RDS')
 
-sites_list<-lakes_list$SITE_CODE
-names(sites_list)<-lakes_list$SITE_NAME
-
-years_list<-rev(1971:year(Sys.Date()))
+lakes_list<-readRDS('outputs/sites_list.RDS')
+years_list<-readRDS('outputs/years_list.RDS')
+parm_list<-readRDS('outputs/parm_list.RDS')
 
 # User Interface ----------------------------------------------------------
 
@@ -98,7 +98,7 @@ ui<-tagList(
                            leafletOutput('trend_summary_map',width='100%'),
                            fluidRow(h2('Trend for Selected Site'),
                                     column(2),
-                                    pickerInput('trend_summary_site','Select Site',sites_list)),
+                                    pickerInput('trend_summary_site','Select Site',lakes_list)),
                            #plotlyOutput('trend_summary_trend_plot')
                            vegawidgetOutput('trend_summary_trend_plot'),
                            htmlOutput('trend_summary_text')
@@ -117,7 +117,7 @@ ui<-tagList(
                                     'productive but are often highly altered lakes and may have frequent algal blooms. Mesotrophic lakes',
                                     'have moderate amounts of nutrients and are common in lowland western Washington, especially in',
                                     'areas with some development along the shoreline and in the watershed')),
-                            pickerInput('main_site','Select Site',sites_list)#,
+                            pickerInput('main_site','Select Site',lakes_list)#,
                          #   selectInput('tsi_year','Select Year to Highlight',years_list),
                             # sliderInput('tsi_trend_years','Select Year Range for Trend',value=c(min(years_list),max(years_list)),
                             #             min=min(years_list),max=max(years_list),
@@ -125,7 +125,8 @@ ui<-tagList(
                )
                ,
                mainPanel(width=9,
-                         fluidRow(vegawidgetOutput('tsi_annual'))
+                         fluidRow(vegawidgetOutput('tsi_annual')),
+                         htmlOutput('tsi_trend_text')
                          
                ))
                
@@ -138,7 +139,7 @@ ui<-tagList(
              column(12, hr()),
              sidebarLayout(
                sidebarPanel(width = 3,
-                            pickerInput('main_site2','Select Site',sites_list, multiple = F),
+                            pickerInput('main_site2','Select Site',lakes_list, multiple = F),
                             selectInput('data_year','Select Year to Highlight',years_list),
                             selectInput('trend_parm','Select Parameter',parm_list),
                             sliderInput('data_month','Select Month(s) for Profile Plots',min=1,max=12,step=1,
@@ -175,7 +176,7 @@ ui<-tagList(
              column(12, hr()),
              sidebarLayout(
                sidebarPanel(width = 3,
-                            pickerInput('main_site4','Select Site to Download',sites_list, multiple = T,
+                            pickerInput('main_site4','Select Site to Download',lakes_list, multiple = T,
                                         options = pickerOptions(
                                           actionsBox = TRUE, 
                                           size = 10,

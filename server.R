@@ -28,7 +28,7 @@ log10_minor_break = function (...){
   }
 }
 # Data Load ---------------------------------------------------------------
-source('wqx_data_query_functions.R',local=T)
+#source('wqx_data_query_functions.R',local=T)
 source('lake_functions/lake_site_map.R',local=T)
 source('lake_functions/lake_trends.R',local=T)
 source('lake_functions/lakes_profile_plot_function.R',local=T)
@@ -39,34 +39,39 @@ source('lake_functions/trend_summary_and_plot.R',local=T)
  source('lake_functions/trend_shiny_functions.R',local=T)
 
 
-lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
-  transmute(
-    SITE_CODE=MonitoringLocationIdentifier,
-    SITE_NAME=MonitoringLocationName,
-    LAT=as.numeric(LatitudeMeasure),
-    LON=as.numeric(LongitudeMeasure)
-  )
+# lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
+#   transmute(
+#     SITE_CODE=MonitoringLocationIdentifier,
+#     SITE_NAME=MonitoringLocationName,
+#     LAT=as.numeric(LatitudeMeasure),
+#     LON=as.numeric(LongitudeMeasure)
+#   )
+lake_sites<-readRDS('outputs/lake_sites.RDS')
+lakes_list<-readRDS('outputs/sites_list.RDS')
+lakes_wq_dat<-readRDS('outputs/lakes_wq_dat.RDS')
+years_list<-readRDS('outputs/years_list.RDS')
+parm_list<-readRDS('outputs/parm_list.RDS')
+# lakes_wq_dat<- WQX_PULL(project='Ambient_Water_Quality_Lakes') %>%
+#   wqx_cleanup()
 
-lakes_wq_dat<- WQX_PULL(project='Ambient_Water_Quality_Lakes') %>%
-  wqx_cleanup()
 lakes_tsi_data<-lakes_wq_dat %>%
   group_by(SITE_CODE) %>%
   tidyr::nest() %>%
-  mutate(TSI_out=map(.x=data,.f=~tsi_calc(.x))) %>%
+  mutate(TSI_out=purrr::map(.x=data,.f=~tsi_calc(.x))) %>%
   select(-data) %>%
   tidyr::unnest(TSI_out)
 
-years_list<-sort(unique(lakes_wq_dat$Year))
-
-parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
-             "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
-             'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
-             'Alkalinity, carbonate','Pheophytin')
+# years_list<-sort(unique(lakes_wq_dat$Year))
+# 
+# parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
+#              "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
+#              'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
+#              'Alkalinity, carbonate','Pheophytin')
 
 server<-function(input,output,session){
   #OPENER TAB
   output$map<-renderLeaflet({
-    site_map(lakes_list)
+    site_map(lake_sites)
   })
   #TSI MAP TAB
   annual_tsi<-reactive({
@@ -82,7 +87,7 @@ server<-function(input,output,session){
   })
   
   output$tsi_map<-renderLeaflet({
-    tsi_map(lakes_list,annual_tsi(),input$tsi_sum_year,plotParm=input$tsi_map_parm)
+    tsi_map(lake_sites,annual_tsi(),input$tsi_sum_year,plotParm=input$tsi_map_parm)
   })
   output$tsi_summary_plot<-renderPlotly({
     tsi_summary_plot(annual_tsi())
@@ -95,7 +100,7 @@ server<-function(input,output,session){
   })
   
   output$trend_summary_map<-renderLeaflet({
-    trend_summary_map(trend_summary(),lakes_list,input)
+    trend_summary_map(trend_summary(),lake_sites,input)
   })
   
   output$trend_summary_trend_plot<-renderVegawidget({
@@ -151,6 +156,9 @@ server<-function(input,output,session){
   output$tsi_annual<-renderVegawidget({
     tsi_plot(data=lakes_wq_dat %>% filter(SITE_CODE==input$main_site),
              epi_depth=5)
+  })
+  output$tsi_trend_text<-renderUI({
+    tsi_trend_text(tsi_trend_summary=tsi_trend_summary_func(lakes_tsi_data),input)
   })
  
   #Individual  Site Water Quality 

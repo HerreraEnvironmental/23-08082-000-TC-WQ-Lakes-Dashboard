@@ -16,12 +16,12 @@ leaflet(site_list) %>%
   addProviderTiles('Esri.NatGeoWorldMap')
 }
 
-lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
-  transmute(
-    SITE_CODE=MonitoringLocationIdentifier,
-    SITE_NAME=MonitoringLocationName,
-    LAT=as.numeric(LatitudeMeasure),
-    LON=as.numeric(LongitudeMeasure)
-  )
-
-site_map(lakes_list)
+# lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
+#   transmute(
+#     SITE_CODE=MonitoringLocationIdentifier,
+#     SITE_NAME=MonitoringLocationName,
+#     LAT=as.numeric(LatitudeMeasure),
+#     LON=as.numeric(LongitudeMeasure)
+#   )
+# 
+# site_map(lakes_list)

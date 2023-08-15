@@ -68,11 +68,16 @@ lake_trends<-function(data,site,parm,rktSeason,startYear,endYear,minDepth,maxDep
   
   shiny::HTML(paste0('<u>Mann-Kendall Trend Test:</u>','<br/>',
               'Between water years <b>',startYear,'</b> and <b>',endYear,'</b>',
-              ifelse(rktSeason=='All','',paste0(' (',rktSeason,')')),
-              ' at ',site,', there is ','<b>',sigStatement,"</b>",' in <b>',parm,'</b><br/>',
-              slopeStatement,
-              '<br/>',
-              'Note values at depths ',minDepth,' to ',maxDepth,' m are averaged for each month with no weighting for volume.'))
+              ifelse(is.na(p.value),
+                     ', there is inadequate data to conduct a trend test.',
+                      paste0(ifelse(rktSeason=='All','',paste0(' (',rktSeason,')')),
+                      ' at ',site,', there is ','<b>',sigStatement,"</b>",' in <b>',parm,'</b><br/>',
+                      slopeStatement,
+                      '<br/>',
+                      'Note values at depths ',minDepth,' to ',maxDepth,' m are averaged for each month with no weighting for volume.'
+                     ))
+              )
+              )
 }
 
 # WQX_PULL(startYear = 2000,endYear = 2022,project='Ambient_Water_Quality_Lakes',
