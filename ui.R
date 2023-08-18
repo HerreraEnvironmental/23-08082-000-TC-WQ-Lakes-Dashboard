@@ -39,7 +39,7 @@ parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
              'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
              'Alkalinity, carbonate','Pheophytin')
 
-tags$head(tags$link(includeScript("func.js")))
+#tags$head(tags$link(includeScript("func.js")))
 tags$head(tags$style("a{cursor:pointer;}"))
 
 ui<-
@@ -245,13 +245,19 @@ ui<-
                               
                  ),
                  mainPanel(width = 9,
-                           h2('Monthly Lake Water Quality Profiles'),
-                           column(9,vegawidgetOutput('data_plot')),
+                           tabsetPanel(
                            hr(),
+                           tabPanel('Monthly Lake Water Quality Profiles',
+                           h2('Monthly Lake Water Quality Profiles'),
+                           fluidRow(column(12,vegawidgetOutput('data_plot'))),
+                           ),
+                           tabPanel('Long-term Trend',
                            h2('Long-term Trend'),
-                           column(9,vegawidgetOutput('trend_plot')),
-                           htmlOutput('trend_text')
-                 )),
+                           fluidRow(column(12,vegawidgetOutput('trend_plot')),
+                                    htmlOutput('trend_text'))
+                           )
+                 ))
+                 ),
                fluidRow(column(12, br()))
       ),
       
