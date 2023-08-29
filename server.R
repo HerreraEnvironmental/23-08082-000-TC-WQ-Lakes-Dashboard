@@ -197,7 +197,7 @@ server<-function(input,output,session){
   dataout_data<-reactive({
     lakes_wq_dat %>%
       filter(SITE_CODE %in% input$main_site4&
-               parameter==input$params_out&
+               parameter %in% input$params_out&
                Year>=input$years_out[1]&Year<=input$years_out[2])%>% 
       select(SITE_CODE,DateTime,parameter,depth,value,unit,qualifier)
   })
@@ -210,7 +210,7 @@ server<-function(input,output,session){
                 options = list(
                   scrollX = TRUE,
                   dom = 't',
-                  autoWidth = TRUE
+                  autoWidth = F
                 ),
                 rownames= FALSE)
     }

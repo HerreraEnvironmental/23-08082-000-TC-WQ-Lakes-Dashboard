@@ -128,16 +128,16 @@ ui<-
       })
      ')),
     tabItems(
-      tabItem('Map',tabName='map',
-               fluidRow(column(12,h1("Water Quality Station Map"))),
-               fluidRow(column(12, hr())),
+      tabItem(tabName='map',
+              column(12,h2("Map of Lake Monitoring Stations")),
+              column(12, hr()),
                fluidRow(column(8,h5("Below are all stations, active and inactive, used to monitor water quality in Thurston County. To learn more about a station, click on the icon and follow the prompts to various data tabs."))),
                fluidRow(column(12, br())),
                fluidRow(column(12,leafletOutput('map',height=700,width="100%"))),
                fluidRow(column(12, br())),
       ),
-      tabItem('Summary of Trophic State Index',tabName='sum_tsi',
-               column(12,h1("Summary of Trophic State Index")),
+      tabItem(tabName='sum_tsi',
+               column(12,h2("Summary of Trophic State Index")),
                column(12, hr()),
                fluidRow(column(8,leafletOutput('tsi_map',height=800,width="100%")),
                         column(4,
@@ -155,8 +155,8 @@ ui<-
                fluidRow(column(12, br()))
       ),
       
-      tabItem('Summary of Water Quality Trends - Surface Only',tabName='trends',
-               column(12,h1("Water Quality Trends")),
+      tabItem(tabName='trends',
+               column(12,h2('Summary of Water Quality Trends - Surface Only')),
                column(12, hr()),
                sidebarLayout(
                  sidebarPanel(width = 3,
@@ -190,8 +190,9 @@ ui<-
                  )),
                fluidRow(column(12, br()))
       ), 
-      tabItem('Lake Trophic State Index',tabName='tsi',
-               column(12,h1("Trophic State Index")),
+      tabItem(tabName='tsi',
+              column(12,h2('Lake Trophic State Index'),
+                     a("Return to Map",href="#",onclick='openTab("map")')),
                column(12, hr()),
                fluidRow(column(12,sidebarLayout(
                  sidebarPanel(width=3,
@@ -218,8 +219,9 @@ ui<-
                fluidRow(column(12, br()))
       ),
       
-      tabItem('Data Visualization and Trends',tabName='all_data',
-               column(12,h1("All Data Viewer")),
+      tabItem(tabName='all_data',
+              column(12,h2('Data Visualization and Trends'),
+                     a("Return to Map",href="#",onclick='openTab("map")')),
                column(12, hr()),
                sidebarLayout(
                  sidebarPanel(width = 3,
@@ -261,8 +263,9 @@ ui<-
                fluidRow(column(12, br()))
       ),
       
-      tabItem('Data Download', tabName = 'data_download',
-               column(12,h1("Data Download")),
+      tabItem(tabName = 'data_download',
+              column(12,h2("Data Download"),
+                     a("Return to Map",href="#",onclick='openTab("map")')),
                column(12, hr()),
                sidebarLayout(
                  sidebarPanel(width = 3,
