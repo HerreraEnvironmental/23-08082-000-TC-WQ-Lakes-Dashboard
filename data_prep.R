@@ -66,7 +66,7 @@ saveRDS(lakes_wq_dat,'outputs/lakes_wq_dat.RDS')
 
 sites_list<-setNames(lake_sites$SITE_CODE,paste0(lake_sites$SITE_NAME,' (',lake_sites$SITE_CODE,')'))
 parm_list<-unique(lakes_wq_dat$parameter)
-years_list<-sort(unique(lakes_wq_dat$WaterYear),T)
+years_list<-sort(unique(lakes_wq_dat$Year),T)
 
 saveRDS(sites_list,'outputs/sites_list.RDS')
 saveRDS(parm_list,'outputs/parm_list.RDS')

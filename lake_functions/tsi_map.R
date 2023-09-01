@@ -14,7 +14,7 @@ tsi_map<-function(lakes_list,annual_tsi,selectYear,plotParm=c('Chlorophyll a','T
     tidyr::pivot_wider(id_cols = c(SITE_CODE),names_from=parameter,values_from = TSI,names_expand=T) %>%
     left_join(selectIndex) %>%
     left_join(lakes_list) %>%
-    mutate(Category=ifelse(TSI>=60,'Eutrophic',ifelse(TSI>=40,"Mesotrophic",'Oligotrophic'))) %>%
+    mutate(Category=ifelse(TSI>=50,'Eutrophic',ifelse(TSI>=40,"Mesotrophic",'Oligotrophic'))) %>%
     leaflet() %>%
     addCircleMarkers(fillColor = ~pal(Category),fillOpacity = 0.9,weight=1,
                      color='black',

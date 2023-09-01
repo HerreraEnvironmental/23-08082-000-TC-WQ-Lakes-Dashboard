@@ -61,12 +61,6 @@ lakes_tsi_data<-lakes_wq_dat %>%
   select(-data) %>%
   tidyr::unnest(TSI_out)
 
-# years_list<-sort(unique(lakes_wq_dat$Year))
-# 
-# parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
-#              "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
-#              'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
-#              'Alkalinity, carbonate','Pheophytin')
 
 server<-function(input,output,session){
   #OPENER TAB
@@ -79,12 +73,12 @@ server<-function(input,output,session){
       filter(Year==input$tsi_sum_year)
   })
   
-  observe({
-    updateSelectInput(session,
-                      'tsi_sum_year',
-                      choices=rev(lakes_tsi_data$Year),
-                      selected=max(lakes_tsi_data$Year))
-  })
+  # observe({
+  #   updateSelectInput(session,
+  #                     'tsi_sum_year',
+  #                     choices=rev(lakes_tsi_data$Year),
+  #                     selected=max(lakes_tsi_data$Year))
+  # })
   
   output$tsi_map<-renderLeaflet({
     tsi_map(lake_sites,annual_tsi(),input$tsi_sum_year,plotParm=input$tsi_map_parm)

@@ -22,7 +22,7 @@ tsi_plot<-function(data,...){
   tsi_lines<-data.frame(
     bottom=0,
     oligo.meso=40,
-    meso.eutro=60,
+    meso.eutro=50,
     top=80
   )
   

@@ -10,7 +10,7 @@ leaflet(site_list) %>%
                            "<li>", "<a onclick=","openTab('data_download')>",'Download all data for this station', '</a>', "<br>","</li>",
                            "</ul>","</h6>"),
              layerId= ~SITE_CODE,
-             label = ~SITE_CODE) %>%
+             label = ~SITE_NAME) %>%
   #addPolygons(data = ThurstonCo_WA,
   #            fillColor = "")%>%
   addProviderTiles('Esri.NatGeoWorldMap')
