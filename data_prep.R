@@ -3,10 +3,10 @@ library(lubridate)
 library(readxl)
 #library(ggplot2)
 
-
+wqp_data<-read.csv('wqp_data.csv')
 #lakes data
 
-lake_sites<-read_xlsx('inputs/Herrera Lakes All.xlsx') %>%
+lake_sites<-wqp_data %>%
   select(SITE_CODE,SITE_NAME,LAT,LON)%>%
   distinct() %>%
   arrange(SITE_NAME) 
@@ -16,9 +16,7 @@ lake_sites<-read_xlsx('inputs/Herrera Lakes All.xlsx') %>%
 saveRDS(lake_sites,'outputs/lake_sites.RDS')
 
 
-lakes_wq_dat<-read_xlsx('inputs/Herrera Lakes All.xlsx',
-                        col_types = c('text','text','numeric','numeric','date','numeric','text','text','text','text',
-                                      'numeric','numeric','text','text','text','numeric','numeric')) %>%
+lakes_wq_dat<-wqp_data %>%
   select(SITE_CODE,DateTime=date_time,parameter,value,unit,depth=depth_m,dup,mdl,pql,qualifier) %>%
   mutate(unit=trimws(unit),
          qualifier=trimws(qualifier),
@@ -32,21 +30,18 @@ lakes_wq_dat<-read_xlsx('inputs/Herrera Lakes All.xlsx',
          Month=month(DateTime),
          WaterYear=ifelse(Month>=10,Year+1,Year),
          FakeDate=as.Date(paste(2000,Month,day(DateTime),sep='-')),
-         WY_FakeDate=as.Date(if_else(Month>=10,FakeDate-years(1),FakeDate))) %>%
-  mutate(parameter=ifelse(parameter=='Water transparency','Secchi Depth',parameter))
-
-lakes_wq_dat["parameter"][lakes_wq_dat["parameter"] == "Temperature, water"] <- "Water Temperature (°C)"
+         WY_FakeDate=as.Date(if_else(Month>=10,FakeDate-years(1),FakeDate)))
 
 lakes_wq_dat<-lakes_wq_dat %>% 
   bind_rows(.,
     lakes_wq_dat %>%
       group_by(SITE_CODE,DateTime,depth,dup,Year,Month,WaterYear,FakeDate,WY_FakeDate) %>%
-      summarise(value=newResultValue[parameter=='Total Persulfate Nitrogen']/newResultValue[parameter=='Total Phosphorus'],
+      summarise(value=newResultValue[parameter=='Total Nitrogen']/newResultValue[parameter=='Total Phosphorus'],
                 newResultValue=value,
-                qualifier=paste(unique(c(qualifier[parameter=='Total Persulfate Nitrogen'],
+                qualifier=paste(unique(c(qualifier[parameter=='Total Nitrogen'],
                                          qualifier[parameter=='Total Phosphorus'])),
                   collapse=' '),
-                nonDetectFlag=any(nonDetectFlag[parameter=='Total Persulfate Nitrogen'],
+                nonDetectFlag=any(nonDetectFlag[parameter=='Total Nitrogen'],
                                     nonDetectFlag[parameter=='Total Phosphorus']),
                 parameter='N:P Ratio'),
     lakes_wq_dat %>%

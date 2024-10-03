@@ -34,10 +34,10 @@ parm_list<-readRDS('outputs/parm_list.RDS')
 
 # User Interface ----------------------------------------------------------
 
-parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
-             "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
-             'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
-             'Alkalinity, carbonate','Pheophytin')
+# parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
+#              "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
+#              'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
+#              'Alkalinity, carbonate','Pheophytin a')
 
 #tags$head(tags$link(includeScript("func.js")))
 tags$head(tags$style("a{cursor:pointer;}"))
