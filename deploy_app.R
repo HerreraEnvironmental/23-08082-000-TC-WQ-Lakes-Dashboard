@@ -1,6 +1,7 @@
 #deploy_App
 
 source('package_check_script.R')
+source('WQP_data_query.R')
 source('data_prep.R')
 
 rsconnect::deployApp(appFiles = c('ui.R',
