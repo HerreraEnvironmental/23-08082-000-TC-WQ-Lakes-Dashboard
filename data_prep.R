@@ -3,6 +3,8 @@ library(lubridate)
 library(readxl)
 #library(ggplot2)
 
+source('WQP_data_query.R')
+
 wqp_data<-read.csv('wqp_data.csv')
 #lakes data
 
