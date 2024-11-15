@@ -7,7 +7,6 @@ rsconnect::deployApp(appFiles = c('ui.R',
                                   'server.R',
                                   'lake_functions/',
                                   'outputs/',
-                                  'wqi_function.R',
                                   'www/'
 ),
 appId=9474652,
