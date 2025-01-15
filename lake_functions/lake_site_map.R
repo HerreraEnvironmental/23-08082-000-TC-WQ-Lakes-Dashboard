@@ -11,8 +11,21 @@ leaflet(site_list) %>%
                            "</ul>","</h6>"),
              layerId= ~SITE_CODE,
              label = ~SITE_NAME) %>%
-  #addPolygons(data = ThurstonCo_WA,
-  #            fillColor = "")%>%
+    leaflet.esri::addEsriFeatureLayer('https://map.co.thurston.wa.us/arcgis/rest/services/Thurston/Thurston_Watersheds/FeatureServer/0',
+                                      useServiceSymbology = TRUE,
+                                      fillColor='lightblue',
+                                      stroke=1,
+                                      color='black',
+                                      popupProperty = JS(paste0(
+                                        "function(feature) {",
+                                        " return L.Util.template(",
+                                        " \"<b>Watershed: {Watershed}</b>",
+                                        " <p>This watershed drains to {Drainage}</p>",
+                                        " \",",
+                                        " feature.properties",
+                                        " );",
+                                        "}"
+                                      ))) %>%
   addProviderTiles('Esri.NatGeoWorldMap')
 }
 

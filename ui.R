@@ -6,6 +6,7 @@ library(ggplot2)
 library(plotly)
 library(shiny)
 library(leaflet)
+library(leaflet.esri)
 library(bslib)
 library(DT)
 library(shinyWidgets)
@@ -121,7 +122,9 @@ ui<-
         overflow: hidden;
         color: white;
       }
-    '))),
+    ')),
+      tags$style(HTML(".vscomp-dropbox-container  {z-index:99999 !important;}")),
+      tags$style(HTML(".vscomp-dropbox {position: absolute; top: 0px !important;}"))),
     tags$script(HTML('
       $(document).ready(function() {
         $("header").find("nav").append(\'<span class="myClass"> Thurston County Lakes Water Quality Data Dashboard - BETA </span>\');
@@ -267,18 +270,12 @@ ui<-
                column(12, hr()),
                sidebarLayout(
                  sidebarPanel(width = 3,
-                              pickerInput('main_site4','Select Site to Download',lakes_list, multiple = T,
-                                          options = pickerOptions(
-                                            actionsBox = TRUE, 
-                                            size = 10,
-                                            selectedTextFormat = "count > 3"
-                                          )),
-                              pickerInput('params_out', "Select Parameter(s)", parm_list,selected=parm_list, multiple = TRUE,
-                                          options = pickerOptions(
-                                            actionsBox = TRUE, 
-                                            size = 10,
-                                            selectedTextFormat = "count > 3"
-                                          )),
+                              virtualSelectInput('main_site4','Select Site to Download',lakes_list, 
+                                                 multiple = T,search = T
+                                          ),
+                              virtualSelectInput('params_out', "Select Parameter(s)", parm_list,selected=parm_list,
+                                                 multiple = TRUE,search = T
+                                      ),
                               sliderInput('years_out','Select Year Range for Download', 
                                           value=c(min(years_list),max(years_list)),
                                           min=min(years_list),max=max(years_list),
