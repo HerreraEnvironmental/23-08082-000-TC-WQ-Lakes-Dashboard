@@ -252,10 +252,10 @@ server<-function(input,output,session){
   observe({
     updateSliderInput(session,
                       'trend_depths',
-                      min=min(dataSubset()$depth),
-                      max=max(dataSubset()$depth),
-                      value=c(min(dataSubset()$depth),
-                              max(dataSubset()$depth)))
+                      min=min(dataSubset()$depth,na.rm=T),
+                      max=max(dataSubset()$depth,na.rm=T),
+                      value=c(min(dataSubset()$depth,na.rm=T),
+                              max(dataSubset()$depth,na.rm=T)))
   })
   
   observe({
