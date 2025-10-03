@@ -1,4 +1,5 @@
 library(tidyverse)
+library(janitor)
 
 ## This is a modified TSI calculation that includes the most recent growing 
 ## period (June to October) for the TSI values; at least 3 of the 6 months of data.
@@ -41,6 +42,8 @@ wide_lakes <- lakes_tsi_data_recent |>
     names_glue = "{parameter}_{.value}" 
   ) |>
   rowwise() |>
-  mutate(TSI_Mean = mean(c_across(ends_with("_TSI")), na.rm = TRUE))
+  mutate(TSI_Mean = mean(c_across(ends_with("_TSI")), na.rm = TRUE)) |>
+  clean_names()
+
 
 write_csv(wide_lakes, "public_dashboard_outputs/lakes_tsi_data_recent.csv")
