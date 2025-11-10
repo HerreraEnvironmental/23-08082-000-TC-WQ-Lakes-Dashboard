@@ -1,5 +1,3 @@
-#ui_Lakes
-
 library(dplyr)
 library(lubridate)
 library(ggplot2)
@@ -18,29 +16,18 @@ library(purrr)
 library(tidyr)
 library(rkt)
 library(vegabrite)
-#source('wqx_data_query_functions.R',local=T)
 
-# lakes_list<-wqx_siteInfo(project='Ambient_Water_Quality_Lakes') %>%
-#   transmute(
-#     SITE_CODE=MonitoringLocationIdentifier,
-#     SITE_NAME=MonitoringLocationName,
-#     LAT=as.numeric(LatitudeMeasure),
-#     LON=as.numeric(LongitudeMeasure)
-#   )
-lake_sites<-readRDS('outputs/lake_sites.RDS')
+
+# Load Data ---------------------------------------------------------------
+#TODO remove once parquet is working
+lake_sites <- read_parquet('outputs/lake_sites.parquet')
+#lake_sites<-readRDS('outputs/lake_sites.RDS')
 
 lakes_list<-readRDS('outputs/sites_list.RDS')
 years_list<-readRDS('outputs/years_list.RDS')
 parm_list<-readRDS('outputs/parm_list.RDS')
 
 # User Interface ----------------------------------------------------------
-
-# parm_list<-c('Chlorophyll a','Total Phosphorus','Secchi Depth',
-#              "Water Temperature (°C)",'Dissolved Oxygen','Specific conductance','pH',
-#              'Nitrate + Nitrite','Ammonia-nitrogen','Total Nitrogen',
-#              'Alkalinity, carbonate','Pheophytin a')
-
-#tags$head(tags$link(includeScript("func.js")))
 tags$head(tags$style("a{cursor:pointer;}"))
 
 ui<-

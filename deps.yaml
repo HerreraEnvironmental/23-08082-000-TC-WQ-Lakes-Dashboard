@@ -1,0 +1,36 @@
+# deps.yaml
+cran:
+  - arrow
+  - tidyverse        # includes dplyr, purrr, ggplot2, readr, tidyr, tibble, stringr, forcats
+  - lubridate
+  - stringr
+  - readr
+  - janitor
+  - glue
+  - httr
+  - jsonlite
+  - bslib
+  - dataRetrieval
+  - DT
+  - fresh
+  - leaflet
+  - plotly
+  - rintrojs
+  - rkt
+  - rsconnect
+  - shiny
+  - shiny.router
+  - shinyBS
+  - shinyjs
+  - shinydashboard
+  - shinyWidgets
+  - vegabrite
+
+# leaflet.esri is archived on CRAN; install from GitHub:
+github:
+  - bhaskarvk/leaflet.esri
+  - vegawidget/vegabrite
+
+dev:
+  - testthat
+  
