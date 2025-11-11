@@ -1,6 +1,10 @@
 # 23-08082-000-TC-WQ-Dashboard
 Thurston County Dashboard
 
+
+#TODO NOTES
+Summary of trophic state index in 2024 not showing, all others ok
+
 This dashboard presents water quality monitoring data for Thurston County lakes
 
 https://herrerainc.shinyapps.io/ThurstonCounty_Lakes_Dashboard_Dev/

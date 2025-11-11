@@ -124,6 +124,6 @@ hec_final <- hec_final[!is.na(hec_final$date_time),]
 
 ## Transform data to format used in Herrera All Stream Data Dump 4 12 2023.csv
 #TODO drop this once converstion to parquet is working
-write_parquet(hec_final, "outputs/wqp_data.parquet")
+write_parquet(hec_final, "inputs/wqp_data.parquet")
 #write.csv(hec_final, file = "wqp_data.csv")
 
