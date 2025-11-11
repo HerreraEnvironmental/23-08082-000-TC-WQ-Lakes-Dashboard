@@ -1,4 +1,4 @@
-SITE_CODE,Year,Chlorophyll a_TSI,Secchi Depth_TSI,Total Phosphorus_TSI,TSI_Mean
+site_code,year,chlorophyll_a_tsi,secchi_depth_tsi,total_phosphorus_tsi,tsi_mean
 EH-BLADEL000,2021,38.8,41,39.1,39.63333333333333
 EH-BUDBLL010,1994,NA,51.3,49.2,50.25
 EH-BUDBLL020,2023,NA,45.7,NA,45.7
