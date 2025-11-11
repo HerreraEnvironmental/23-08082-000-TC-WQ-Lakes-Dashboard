@@ -26,7 +26,7 @@ cran:
   - shinyWidgets
   - vegabrite
 
-# leaflet.esri is archived on CRAN; install from GitHub:
+# leaflet.esri/vegawidget is archived on CRAN; install from GitHub:
 github:
   - bhaskarvk/leaflet.esri
   - vegawidget/vegabrite
