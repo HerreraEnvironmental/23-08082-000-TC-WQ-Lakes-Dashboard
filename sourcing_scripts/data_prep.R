@@ -5,7 +5,8 @@ library(readxl)
 ## Source external lakes data from WQP
 source('sourcing_scripts/WQP_data_query.R')
 
-wqp_data<-read.csv('inputs/wqp_data.csv')
+#wqp_data<-read.csv('inputs/wqp_data.csv') #TODO delete once parquets are working
+wqp_data<-read_parquet('inputs/wqp_data.parquet')
 
 lake_sites<-wqp_data %>%
   select(SITE_CODE,SITE_NAME,LAT,LON)%>%
