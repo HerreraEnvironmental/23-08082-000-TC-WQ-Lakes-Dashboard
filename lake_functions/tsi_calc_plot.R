@@ -17,20 +17,16 @@ tsi_calc <- function(
     dplyr::summarise(SummerMean = mean(newResultValue, na.rm = TRUE), .groups = "drop") |>
     dplyr::ungroup() |>
     dplyr::mutate(
-      TSI = round(
-        ifelse(
-          parameter == "Total Phosphorus", 14.42 * log(SummerMean * 1000) + 4.15,
-          ifelse(
-            parameter == "Chlorophyll a", 9.81 * log(SummerMean) + 30.6,
-            ifelse(
-              parameter == "Secchi Depth" | parameter == "Water transparency",
-              60 - 14.41 * log(SummerMean),
-              NA
-            )
-          )
-        ),
-        1
-      )
+      TSI = dplyr::case_when(
+        parameter == "Total Phosphorus" &
+          is.finite(SummerMean) & SummerMean > 0 ~ 14.42 * log(SummerMean * 1000) + 4.15,
+        parameter == "Chlorophyll a" &
+          is.finite(SummerMean) & SummerMean > 0 ~ 9.81 * log(SummerMean) + 30.6,
+        (parameter == "Secchi Depth" | parameter == "Water transparency") &
+          is.finite(SummerMean) & SummerMean > 0 ~ 60 - 14.41 * log(SummerMean),
+        TRUE ~ NA_real_
+      ),
+      TSI = round(TSI, 1)
     )
 }
 

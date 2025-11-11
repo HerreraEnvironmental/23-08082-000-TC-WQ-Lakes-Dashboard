@@ -325,10 +325,10 @@ ui <-
               ),
               hr()
             ),
-            mainPanel(
+              mainPanel(
               width = 9,
+              hr(),
               tabsetPanel(
-                hr(),
                 tabPanel(
                   "Monthly Lake Water Quality Profiles",
                   h2("Monthly Lake Water Quality Profiles"),
