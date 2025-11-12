@@ -1,7 +1,7 @@
 #deploy_App
 
-source('package_check_script.R')
-source('data_prep.R')
+source('install_deps.R')
+source('sourcing_scripts/data_prep.R')
 
 rsconnect::deployApp(appFiles = c('ui.R',
                                   'server.R',
