@@ -8,33 +8,29 @@ tsi_map <- function(
 ) {
   plotParm <- plotParm[1]
 
-  pal <- colorFactor(
-    c("green", "yellow", "blue", "grey"),
-    levels = c("Eutrophic", "Mesotrophic", "Oligotrophic", NA)
+  levels_vec <- c("Eutrophic", "Mesotrophic", "Oligotrophic")
+  pal <- leaflet::colorFactor(
+    palette = c("green", "yellow", "blue"),
+    levels = levels_vec,
+    na.color = "grey"
   )
 
-  selectIndex <- annual_tsi %>%
-    dplyr::filter(parameter == plotParm) %>%
+  # Keep only the selected year and parameter
+  mapped <- annual_tsi |>
+    dplyr::filter(Year == selectYear, parameter == plotParm) |>
+    dplyr::left_join(lakes_list, by = "SITE_CODE") |>
     dplyr::mutate(
-      parameter = factor(parameter, levels = c("Chlorophyll a", "Total Phosphorus", "Secchi Depth"))
+      Category = dplyr::case_when(
+        is.na(TSI) ~ NA_character_,
+        TSI >= 60 ~ "Eutrophic",          # align with tsi_summary_plot
+        TSI >= 40 ~ "Mesotrophic",
+        TRUE ~ "Oligotrophic"
+      ),
+      Category = factor(Category, levels = levels_vec)
     )
 
-  annual_tsi %>%
-    tidyr::pivot_wider(
-      id_cols = c(SITE_CODE),
-      names_from = parameter,
-      values_from = TSI,
-      names_expand = TRUE
-    ) %>%
-    dplyr::left_join(selectIndex) %>%
-    dplyr::left_join(lakes_list) %>%
-    dplyr::mutate(
-      Category = ifelse(
-        TSI >= 50, "Eutrophic",
-        ifelse(TSI >= 40, "Mesotrophic", "Oligotrophic")
-      )
-    ) %>%
-    leaflet::leaflet() %>%
+  mapped |>
+    leaflet::leaflet() |>
     leaflet::addCircleMarkers(
       fillColor = ~pal(Category),
       fillOpacity = 0.9,
@@ -48,14 +44,11 @@ tsi_map <- function(
       ),
       layerId = ~SITE_CODE,
       label = ~SITE_CODE
-    ) %>%
-    leaflet::addProviderTiles("Esri.NatGeoWorldMap") %>%
+    ) |>
+    leaflet::addProviderTiles("Esri.NatGeoWorldMap") |>
     leaflet::addLegend(
       pal = pal,
-      values = factor(
-        c("Eutrophic", "Mesotrophic", "Oligotrophic"),
-        levels = c("Eutrophic", "Mesotrophic", "Oligotrophic")
-      ),
+      values = factor(levels_vec, levels = levels_vec),
       title = paste("Trophic State Index for", plotParm)
     )
 }
