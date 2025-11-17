@@ -91,7 +91,9 @@ server <- function(input, output, session) {
   
   annual_tsi <- reactive({
     lakes_tsi_data |>
-      dplyr::filter(Year == input$tsi_sum_year)
+      dplyr::filter(Year == input$tsi_sum_year) |>
+      dplyr::mutate(parameter=factor(parameter,levels=c('Chlorophyll a','Total Phosphorus','Secchi Depth'))) |>
+      tidyr::complete(Year,parameter,fill=list(SummerMean=NA,TSI=NA))
   })
 
   output$tsi_map <- renderLeaflet({

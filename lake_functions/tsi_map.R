@@ -60,7 +60,7 @@ tsi_summary_plot <- function(annual_tsi) {
     "Oligotrophic" = "blue"
   )
 
-  tsi_summary_plot <- annual_tsi %>%
+  tsi_summary_plot <- annual_tsi |>
     dplyr::mutate(
       Category = factor(
         ifelse(
@@ -69,7 +69,8 @@ tsi_summary_plot <- function(annual_tsi) {
         ),
         levels = c("Eutrophic", "Mesotrophic", "Oligotrophic")
       )
-    ) %>%
+    ) |>
+    filter(!is.na(TSI)) |>
     ggplot2::ggplot(ggplot2::aes(x = Category)) +
     ggplot2::geom_bar(stat = "count", ggplot2::aes(fill = Category)) +
     ggplot2::scale_x_discrete(drop = FALSE) +
