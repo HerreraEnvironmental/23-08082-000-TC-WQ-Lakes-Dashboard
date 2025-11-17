@@ -1,3 +1,5 @@
+library(shiny)
+library(arrow)
 # Load Data ---------------------------------------------------------------
 lake_sites <- read_parquet("outputs/lake_sites.parquet")
 lakes_list <- readRDS("outputs/sites_list.RDS")

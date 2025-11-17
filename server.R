@@ -1,3 +1,22 @@
+library(arrow)
+library(tidyverse)
+library(plotly)
+library(shiny)
+library(leaflet)
+library(leaflet.esri)
+library(bslib)
+library(DT)
+library(shinyWidgets)
+library(shinydashboard)
+library(shiny.router)
+library(shinyjs)
+library(shinyBS)
+library(purrr)
+library(tidyr)
+library(rkt)
+library(vegabrite)
+library(purrr)
+
 log10_minor_break <- function(...) {
   function(x) {
     minx <- floor(min(log10(x), na.rm = TRUE)) - 1
