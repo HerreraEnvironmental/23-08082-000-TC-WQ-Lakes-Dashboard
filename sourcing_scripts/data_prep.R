@@ -38,7 +38,9 @@ lakes_wq_dat <- wqp_data |>
     mdl = ifelse(mdl == 0, max(mdl[parameter == parameter]), mdl),
     pql = ifelse(pql < mdl, mdl, pql),
     newResultValue = ifelse(nonDetectFlag, mdl, value),
+    #set negative turbidity values to 0.01 NTU (assume near zero) and negative TP values to NA (assume those are missing or errors in data upload)
     newResultValue = ifelse(parameter == 'Turbidity' & newResultValue <= 0, 0.01, newResultValue),
+    newResultValue=ifelse(parameter=='Total Phosphorus'&newResultValue<=0,NA,newResultValue),
     Year = year(DateTime),
     Month = month(DateTime),
     WaterYear = ifelse(Month >= 10, Year + 1, Year),
@@ -98,6 +100,8 @@ lakes_wq_dat <- lakes_wq_dat |>
   mutate(qualifier = trimws(gsub('NA', '', qualifier)))
 
 write_parquet(lakes_wq_dat, 'outputs/lakes_wq_dat.parquet')
+
+source('public_tsi.R')
 
 sites_list <- setNames(
   lake_sites$SITE_CODE,

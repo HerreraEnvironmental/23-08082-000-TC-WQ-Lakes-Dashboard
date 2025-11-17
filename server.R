@@ -66,6 +66,10 @@ server <- function(input, output, session) {
   })
 
   # TSI MAP TAB -----------------------------------------------------------
+  updateSelectInput(session, "tsi_sum_year", 
+  choices = sort(unique(lakes_tsi_data$Year),decreasing = T),
+  selected=    max(lakes_tsi_data$Year))
+  
   annual_tsi <- reactive({
     lakes_tsi_data |>
       dplyr::filter(Year == input$tsi_sum_year)
@@ -78,6 +82,7 @@ server <- function(input, output, session) {
   output$tsi_summary_plot <- renderPlotly({
     tsi_summary_plot(annual_tsi())
   })
+
 
   # TRENDS TAB ------------------------------------------------------------
   trend_summary <- reactive({

@@ -5,7 +5,7 @@ library(janitor)
 ## period (June to October) for the TSI values; at least 3 of the 6 months of data.
 
 
-lakes_wq_dat<-readRDS('archive/lakes_wq_dat.RDS')
+lakes_wq_dat <- read_parquet("outputs/lakes_wq_dat.parquet")
 
 tsi_calc_recent <-function(data,epi_depth=5,startMonth=6,endMonth=10){
   data |>
