@@ -1,5 +1,20 @@
-library(shiny)
 library(arrow)
+library(tidyverse)
+library(plotly)
+library(shiny)
+library(leaflet)
+library(leaflet.esri)
+library(bslib)
+library(DT)
+library(shinyWidgets)
+library(shinydashboard)
+library(shiny.router)
+library(shinyjs)
+library(shinyBS)
+library(tidyr)
+library(vegabrite)
+
+
 # Load Data ---------------------------------------------------------------
 lake_sites <- read_parquet("outputs/lake_sites.parquet")
 lakes_list <- readRDS("outputs/sites_list.RDS")
