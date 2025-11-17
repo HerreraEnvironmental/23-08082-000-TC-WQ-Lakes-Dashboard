@@ -30,7 +30,7 @@ ui <-
       ")"
     ),
     dashboardHeader(
-      title = img(src = "www/TC2.png", height = 120),
+      title = img(src = "TC2.png", height = 120),
       tags$li(
         class = "dropdown",
         tags$style(".main-header {max-height: 135px}"),
