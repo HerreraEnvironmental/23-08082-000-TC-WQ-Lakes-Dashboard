@@ -1,6 +1,8 @@
 library(dplyr)
 library(ggplot2)
 library(readxl)
+library(lubridate)
+library(arrow)
 
 OLD_HEC_DATA<-read_xlsx('inputs/Herrera Lakes All.xlsx',
                         col_types = c('text','text','numeric','numeric','date','numeric','text','text','text','text',
@@ -48,8 +50,25 @@ OLD_HEC_DATA<-OLD_HEC_DATA %>%
 
 #saveRDS(OLD_HEC_DATA,'outputs/OLD_HEC_DATA.RDS')
 
-wqp_data<-read_parquet('outputs/lakes_wq_dat.parquet')
+#pattison lake (north)
+#in 2004 there is definitely chl-a data
+#see page 219 of https://s3.us-west-2.amazonaws.com/thurstoncountywa.gov.if-us-west-2/s3fs-public/2023-02/2003-2005%20Water%20Quality%20Report.pdf
+OLD_HEC_DATA |>
+  filter(SITE_CODE=='EH-HENNPL010') |>
+  filter(Year==2004) |>
+  group_by(Month,parameter) |>
+  reframe(Count=n()) |>
+  tidyr::pivot_wider(names_from=parameter,values_from=Count)
 
+
+wqp_data<-read_parquet('outputs/lakes_wq_dat.parquet') 
+
+wqp_data |>
+  filter(SITE_CODE=='EH-HENNPL010') |>
+  filter(Year==2004) |>
+  group_by(Month,parameter) |>
+  reframe(Count=n()) |>
+  tidyr::pivot_wider(names_from=parameter,values_from=Count)
 
 glimpse(wqp_data)
 glimpse(OLD_HEC_DATA)
