@@ -93,6 +93,7 @@ hec_data_merged <- hec_data_merged |>
   )
 
 hec_final <- hec_data_merged |>
+  mutate(Depth=if_else(Depth_Unit=='ft',0.3048*Depth,Depth)) |>
   select(
     SITE_CODE,
     Metro_ID = MonitoringLocationIdentifier,
@@ -115,6 +116,7 @@ hec_final <- hec_data_merged |>
     lab_batch
   ) |>
   mutate(
+    date_time=ymd_hms(date_time,quiet=T),,
     parameter = dplyr::case_when(
       parameter %in% c("Total Phosphorus, mixed forms", "Phosphorus") ~ "Total Phosphorus",
       parameter == "Dissolved oxygen (DO)" & unit == "%" ~ "Dissolved Oxygen (saturation)",
@@ -134,10 +136,6 @@ hec_final <- hec_data_merged |>
     )
   )
 
-# Restructure datetime 
-hec_final$date_time <- ymd_hms(hec_final$date_time, quiet = TRUE)
-hec_final <- hec_final[!is.na(hec_final$date_time), ]
-
 ## Transform data to format used in Herrera All Stream Data Dump 4 12 2023.csv
-write_parquet(hec_final, "inputs/wqp_data.parquet")
+write_parquet(hec_final, "inputs/wqp_data_forDash.parquet")
 
