@@ -6,10 +6,10 @@ library(readxl)
 source('sourcing_scripts/WQP_data_query.R')
 
 ## Produced in sourcing_scripts/WQP_data_query.
-wqp_data <- read_parquet('inputs/wqp_data.parquet')
+wqp_data_forDash <- read_parquet('inputs/wqp_data_forDash.parquet')
 
 ## Set lake sites
-lake_sites <- wqp_data |>
+lake_sites <- wqp_data_forDash |>
   select(SITE_CODE, SITE_NAME, LAT, LON) |>
   distinct() |>
   arrange(SITE_NAME)
@@ -17,7 +17,7 @@ lake_sites <- wqp_data |>
 write_parquet(lake_sites, 'outputs/lake_sites.parquet')
 
 ## Prepare lake water quality data
-lakes_wq_dat <- wqp_data |>
+lakes_wq_dat <- wqp_data_forDash |>
   select(
     SITE_CODE,
     DateTime = date_time,
@@ -107,13 +107,41 @@ sites_list <- setNames(
   lake_sites$SITE_CODE,
   paste0(lake_sites$SITE_NAME, ' (', lake_sites$SITE_CODE, ')')
 )
-parm_list <- unique(lakes_wq_dat$parameter)
+
+ordered_parms<-c(
+    "Chlorophyll a",
+    "Secchi Depth",
+    "Total Phosphorus",
+    "Total Nitrogen",
+    "Nitrate + Nitrite",
+    "Ammonia-nitrogen",
+    'N:P Ratio',
+    'Pheophytin a',
+    "Chl-a:Pheo-a Ratio",
+    "Water Temperature (°C)",
+    "Dissolved Oxygen",
+    "Specific conductance",
+    "pH",
+    "Alkalinity, carbonate",
+    "Microcystin",
+    "Anatoxin-A",
+    'Cylindrospermopsin',
+    'Saxitoxin'#,
+   # "Depth to bottom of sample interval"
+  )
+
+parm_list <- unique(lakes_wq_dat$parameter) %>%
+  factor(c(ordered_parms,
+          unique(lakes_wq_dat$parameter)[!(unique(lakes_wq_dat$parameter) %in% ordered_parms)])) %>%
+  levels()
+
+
 years_list <- sort(unique(lakes_wq_dat$Year), T)
 
 saveRDS(sites_list, 'outputs/sites_list.RDS')
 saveRDS(parm_list, 'outputs/parm_list.RDS')
 saveRDS(years_list, 'outputs/years_list.RDS')
 
-unique(lakes_wq_dat$depth)
-unique(lakes_wq_dat$dup)
-unique(lakes_wq_dat$qualifier)
+# unique(lakes_wq_dat$depth)
+# unique(lakes_wq_dat$dup)
+# unique(lakes_wq_dat$qualifier)
