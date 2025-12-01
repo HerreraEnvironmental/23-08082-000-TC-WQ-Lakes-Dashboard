@@ -16,6 +16,8 @@ lake_trends_plot <- function(
   temp_trend_data <- data |>
     dplyr::filter(parameter == parm)
 
+  unit_s = paste(unique(temp_trend_data$unit),collapse = '; ')
+
   if (rktSeason == "winter") {
     temp_trend_data <- temp_trend_data |> dplyr::filter(Month >= 1 & Month <= 3)
   }
@@ -33,14 +35,15 @@ lake_trends_plot <- function(
     vl_encode_color(field = "depth:Q") |>
     vl_encode_y(
       "value:Q",
-      title = parm,
+      title = paste0(parm,'(',unit_s,')'),
       scale = list(type = ifelse(logPlot, "log", "linear"))
     ) |>
     vl_mark_point(filled = TRUE, size = 100) |>
     vl_encode_tooltip(field = "parameter:N") |>
     vl_encode_tooltip(field = "DateTime:T") |>
     vl_encode_tooltip(field = "depth:Q") |>
-    vl_encode_tooltip(field = "value:Q")
+    vl_encode_tooltip(field = "value:Q") |>
+    vl_encode_tooltip(field = "unit:N") 
 
   line <- vl_chart() |>
     vl_filter(
@@ -55,7 +58,7 @@ lake_trends_plot <- function(
     vl_loess(loess = "value", on = "DateTime", bandwidth = 1) |>
     vl_encode_y(
       "value:Q",
-      title = parm,
+      title = paste0(parm,'(',unit_s,')'),
       scale = list(type = ifelse(logPlot, "log", "linear"))
     )
 

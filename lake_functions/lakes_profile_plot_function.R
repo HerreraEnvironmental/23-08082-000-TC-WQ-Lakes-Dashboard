@@ -19,6 +19,7 @@ lake_profile_plot <- function(
 
   scale_type <- ifelse(profile_log, "log", "linear")
 
+  unit_s = paste(unique(profile_data$unit),collapse = '; ')
   # Base points (all years)
   points <- vl_chart() |>
     vl_mark_point(filled = TRUE, size = 50, color = "grey")
@@ -38,7 +39,7 @@ lake_profile_plot <- function(
     vl_encode_x(
       "value:Q",
       scale = list(type = scale_type),
-      title = parm
+      title = paste0(parm,'(',unit_s,')')
     ) |>
     vl_encode_y(
       "depth:Q",
@@ -50,6 +51,7 @@ lake_profile_plot <- function(
     vl_encode_tooltip(field = "DateTime:T") |>
     vl_encode_tooltip(field = "depth:Q") |>
     vl_encode_tooltip(field = "value:Q") |>
+    vl_encode_tooltip(field = "unit:N") |>
     vl_add_properties(width = 250, height = 250) |>
     vl_facet(field = "Month", type = "ordinal", columns = 3)
 }
