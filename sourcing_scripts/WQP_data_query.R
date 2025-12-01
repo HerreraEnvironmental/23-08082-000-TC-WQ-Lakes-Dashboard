@@ -92,7 +92,25 @@ hec_data_merged <- hec_data_merged |>
     lab_batch = NA
   )
 
+#looking at the Hicks Lake, for example, it looks like they reported it as feet, 
+#but it is actually in m (based on the observed TP, which are extemely high and nothing at depth is shown)
+#need to make an assumption here.
+# hec_data_merged %>%
+#   filter(grepl('Phosphorus',CharacteristicName)) %>%
+#   select(MonitoringLocationIdentifier,ActivityStartDate,
+#   Depth,Depth_Unit) %>%
+#   distinct() %>%
+#   ggplot(aes(x=as_date(ActivityStartDate),y=Depth,
+# col=Depth_Unit))+
+#     geom_point()+
+#   facet_wrap(~MonitoringLocationIdentifier,scales='free_y')+
+#   scale_y_reverse()
+#there is no change in the depth values shown when the unit shifts.
+#therefore, this is likely an issue of incorrect depth input.
+
 hec_final <- hec_data_merged |>
+  #not actually feet, stop converting
+  #mutate(Depth=if_else(Depth_Unit=='ft',0.3048*Depth,Depth)) |>
   select(
     SITE_CODE,
     Metro_ID = MonitoringLocationIdentifier,
@@ -115,6 +133,7 @@ hec_final <- hec_data_merged |>
     lab_batch
   ) |>
   mutate(
+    date_time=ymd_hms(date_time,quiet=T),,
     parameter = dplyr::case_when(
       parameter %in% c("Total Phosphorus, mixed forms", "Phosphorus") ~ "Total Phosphorus",
       parameter == "Dissolved oxygen (DO)" & unit == "%" ~ "Dissolved Oxygen (saturation)",
@@ -134,10 +153,6 @@ hec_final <- hec_data_merged |>
     )
   )
 
-# Restructure datetime 
-hec_final$date_time <- ymd_hms(hec_final$date_time, quiet = TRUE)
-hec_final <- hec_final[!is.na(hec_final$date_time), ]
-
 ## Transform data to format used in Herrera All Stream Data Dump 4 12 2023.csv
-write_parquet(hec_final, "inputs/wqp_data.parquet")
+write_parquet(hec_final, "inputs/wqp_data_forDash.parquet")
 

@@ -309,14 +309,14 @@ server <- function(input, output, session) {
     updateSelectInput(
       session,
       "trend_parm",
-      choices = parm_list[
-        parm_list %in% (
-          lakes_wq_dat |>
-            dplyr::filter(SITE_CODE == input$main_site) |>
-            dplyr::pull(parameter) |>
-            unique()
-        )
-      ]
+      choices = parm_list#[
+      #  parm_list %in% (
+      #     lakes_wq_dat |>
+      #       dplyr::filter(SITE_CODE == input$main_site) |>
+      #       dplyr::pull(parameter) |>
+      #       unique()
+      #   )
+      # ]
     )
   })
 
@@ -343,14 +343,14 @@ server <- function(input, output, session) {
     updateSelectInput(
       session,
       "data_parm",
-      choices = parm_list[
-        parm_list %in% (
-          lakes_wq_dat |>
-            dplyr::filter(SITE_CODE == input$main_site) |>
-            dplyr::pull(parameter) |>
-            unique()
-        )
-      ]
+      choices = parm_list#[
+      #   parm_list %in% (
+      #     lakes_wq_dat |>
+      #       dplyr::filter(SITE_CODE == input$main_site) |>
+      #       dplyr::pull(parameter) |>
+      #       unique()
+      #   )
+      # ]
     )
   })
 
