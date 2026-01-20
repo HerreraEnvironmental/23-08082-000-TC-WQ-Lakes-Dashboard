@@ -108,7 +108,7 @@ server <- function(input, output, session) {
   # TRENDS TAB ------------------------------------------------------------
   trend_summary <- reactive({
     trend_summary_func(lakes_wq_dat |>
-                         dplyr::filter(depth <= 1), input)
+           dplyr::filter(depth4plot <= 1), input)
   })
 
   output$trend_summary_map <- renderLeaflet({
@@ -118,7 +118,7 @@ server <- function(input, output, session) {
   output$trend_summary_trend_plot <- renderVegawidget({
     lake_trends_plot(
       lakes_wq_dat |>
-        dplyr::filter(SITE_CODE == input$trend_summary_site & depth <= 1),
+        dplyr::filter(SITE_CODE == input$trend_summary_site & depth4plot <= 1),
       site = input$trend_summary_site,
       parm = input$trend_summary_parm,
       rktSeason = input$rktSeason,
@@ -134,7 +134,7 @@ server <- function(input, output, session) {
   output$trend_summary_text <- renderUI({
     lake_trends(
       lakes_wq_dat |>
-        dplyr::filter(SITE_CODE == input$trend_summary_site & depth <= 1),
+        dplyr::filter(SITE_CODE == input$trend_summary_site & depth4plot <= 1),
       site = input$trend_summary_site,
       parm = input$trend_summary_parm,
       rktSeason = input$rktSeason,
@@ -296,11 +296,11 @@ server <- function(input, output, session) {
     updateSliderInput(
       session,
       "trend_depths",
-      min = min(dataSubset()$depth, na.rm = TRUE),
-      max = max(dataSubset()$depth, na.rm = TRUE),
+      min = min(dataSubset()$depth4plot, na.rm = TRUE),
+      max = max(dataSubset()$depth4plot, na.rm = TRUE),
       value = c(
-        min(dataSubset()$depth, na.rm = TRUE),
-        max(dataSubset()$depth, na.rm = TRUE)
+        min(dataSubset()$depth4plot, na.rm = TRUE),
+        max(dataSubset()$depth4plot, na.rm = TRUE)
       )
     )
   })

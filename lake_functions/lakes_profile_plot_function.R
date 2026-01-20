@@ -15,7 +15,7 @@ lake_profile_plot <- function(
       Month >= month[1],
       Month <= month[2]
     ) |>
-    dplyr::arrange(depth)
+    dplyr::arrange(depth4plot)
 
   scale_type <- ifelse(profile_log, "log", "linear")
 
@@ -42,14 +42,14 @@ lake_profile_plot <- function(
       title = paste0(parm,'(',unit_s,')')
     ) |>
     vl_encode_y(
-      "depth:Q",
+      "depth4plot:Q",
       title = "Depth (m)",
       scale = list(reverse = TRUE, domain = c(0, maxDepth))
     ) |>
-    vl_encode_order(field = "depth:Q") |>
+    vl_encode_order(field = "depth4plot:Q") |>
     vl_encode_tooltip(field = "parameter:N") |>
     vl_encode_tooltip(field = "DateTime:T") |>
-    vl_encode_tooltip(field = "depth:Q") |>
+    vl_encode_tooltip(field = "depth4plot:Q") |>
     vl_encode_tooltip(field = "value:Q") |>
     vl_encode_tooltip(field = "unit:N") |>
     vl_add_properties(width = 250, height = 250) |>

@@ -46,7 +46,10 @@ lakes_wq_dat <- wqp_data_forDash |>
     WaterYear = ifelse(Month >= 10, Year + 1, Year),
     FakeDate = as.Date(paste(2000, Month, day(DateTime), sep = '-')),
     WY_FakeDate = as.Date(if_else(Month >= 10, FakeDate - years(1), FakeDate))
-  )
+  ) |>
+    #fix for Secchi depth "depth" and chlorophyll a missing depths
+  mutate(depth4plot=ifelse(parameter=='Secchi Depth',0.5,
+                          ifelse(parameter=='Chlorophyll a'&is.na(depth),0.5,depth)))
 
 # Centralize grouping columns
 group_cols <- c(

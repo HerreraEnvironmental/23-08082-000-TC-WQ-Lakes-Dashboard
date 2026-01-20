@@ -32,7 +32,7 @@ lake_trends_plot <- function(
   }
 
   dots <- vl_chart() |>
-    vl_encode_color(field = "depth:Q") |>
+    vl_encode_color(field = "depth4plot:Q") |>
     vl_encode_y(
       "value:Q",
       title = paste0(parm,'(',unit_s,')'),
@@ -41,7 +41,7 @@ lake_trends_plot <- function(
     vl_mark_point(filled = TRUE, size = 100) |>
     vl_encode_tooltip(field = "parameter:N") |>
     vl_encode_tooltip(field = "DateTime:T") |>
-    vl_encode_tooltip(field = "depth:Q") |>
+    vl_encode_tooltip(field = "depth4plot:Q") |>
     vl_encode_tooltip(field = "value:Q") |>
     vl_encode_tooltip(field = "unit:N") 
 
@@ -84,8 +84,8 @@ lake_trends <- function(
       parameter == parm,
       Year >= startYear,
       Year <= endYear,
-      depth >= minDepth,
-      depth <= maxDepth
+      depth4plot >= minDepth,
+      depth4plot <= maxDepth
     )
 
   if (rktSeason == "winter") {
@@ -137,7 +137,9 @@ lake_trends <- function(
           "Note values at depths ", minDepth, " to ", maxDepth,
           " m are averaged for each month with no weighting for volume."
         )
-      )
+      ),
+      ifelse(parm=='Chlorophyll a',"<br/> Note that some samples for chlorophyll a
+           are integrated over several depths, but are presented as 0.5 m for the purposes of plotting",'')
     )
   )
 }

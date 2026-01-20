@@ -11,7 +11,7 @@ tsi_calc <- function(
       parameter %in% c("Secchi Depth", "Water transparency", "Total Phosphorus", "Chlorophyll a"),
       Month >= startMonth,
       Month <= endMonth,
-      depth <= epi_depth
+      depth4plot <= epi_depth
     ) |>
     dplyr::group_by(Year, parameter) |>
     dplyr::summarise(SummerMean = mean(newResultValue, na.rm = TRUE), .groups = "drop") |>
